@@ -12,10 +12,13 @@ import {
   Users,
   Cpu,
   Activity,
-  ShieldCheck,
   HeartPulse,
   LogOut,
-  Repeat
+  Repeat,
+  CheckCircle2,
+  Bell,
+  HelpCircle,
+  Wand2
 } from 'lucide-react';
 
 export default function Sidebar() {
@@ -23,13 +26,16 @@ export default function Sidebar() {
   const location = useLocation();
 
   const creatorNav = [
-    { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
-    { label: 'My Posts', path: '/posts', icon: Sparkles },
-    { label: 'Schedule Calendar', path: '/posts/scheduled', icon: Calendar },
-    { label: 'Comment Automations', path: '/automations', icon: MessageSquareReply },
-    { label: 'Connect Accounts', path: '/connect-accounts', icon: Share2 },
-    { label: 'Content Preferences', path: '/content-preferences', icon: Sliders },
+    { label: 'Overview', path: '/dashboard', icon: LayoutDashboard },
+    { label: 'Social Accounts', path: '/connect-accounts', icon: Share2 },
+    { label: 'AI Content Studio', path: '/ai-studio', icon: Wand2 },
+    { label: 'Content Calendar', path: '/posts/scheduled', icon: Calendar },
+    { label: 'Published Posts', path: '/posts/published', icon: CheckCircle2 },
+    { label: 'Comment Automation', path: '/automations', icon: MessageSquareReply },
     { label: 'Analytics', path: '/analytics', icon: BarChart3 },
+    { label: 'Notifications', path: '/notifications', icon: Bell },
+    { label: 'Settings', path: '/settings', icon: Sliders },
+    { label: 'Help & Support', path: '/help', icon: HelpCircle },
   ];
 
   const adminNav = [
@@ -56,7 +62,7 @@ export default function Sidebar() {
       zIndex: 50
     }}>
       {/* Brand Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', paddingBottom: '24px', borderBottom: '1px solid var(--border-color)', marginBottom: '20px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', paddingBottom: '24px', borderBottom: '1px solid var(--border-color)', marginBottom: '16px' }}>
         <div style={{
           width: '40px',
           height: '40px',
@@ -82,10 +88,10 @@ export default function Sidebar() {
       {/* Mode Switcher Toggle */}
       <div style={{
         background: 'rgba(255,255,255,0.04)',
-        padding: '10px 12px',
+        padding: '8px 12px',
         borderRadius: '10px',
         border: '1px solid var(--border-color)',
-        marginBottom: '20px',
+        marginBottom: '16px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between'
@@ -96,14 +102,14 @@ export default function Sidebar() {
         <button
           onClick={() => switchRole(role === 'admin' ? 'creator' : 'admin')}
           className="btn-secondary"
-          style={{ padding: '4px 8px', fontSize: '11px', gap: '4px' }}
+          style={{ padding: '3px 8px', fontSize: '11px', gap: '4px' }}
         >
           <Repeat size={12} /> Switch
         </button>
       </div>
 
       {/* Navigation Links */}
-      <nav style={{ display: 'flex', flexDirection: 'column', gap: '6px', flex: 1 }}>
+      <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: 1, overflowY: 'auto', paddingRight: '4px' }}>
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = location.pathname === item.path;
@@ -116,18 +122,18 @@ export default function Sidebar() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '12px',
-                padding: '11px 16px',
-                borderRadius: '10px',
+                padding: '9px 14px',
+                borderRadius: '9px',
                 color: isActive ? '#fff' : 'var(--text-muted)',
                 background: isActive ? 'linear-gradient(90deg, rgba(99, 102, 241, 0.2) 0%, rgba(99, 102, 241, 0.05) 100%)' : 'transparent',
                 borderLeft: isActive ? '3px solid var(--primary)' : '3px solid transparent',
                 textDecoration: 'none',
                 fontWeight: isActive ? 700 : 500,
-                fontSize: '14px',
+                fontSize: '13.5px',
                 transition: 'all 0.15s ease'
               }}
             >
-              <Icon size={18} color={isActive ? 'var(--primary)' : 'currentColor'} />
+              <Icon size={17} color={isActive ? 'var(--primary)' : 'currentColor'} />
               {item.label}
             </NavLink>
           );
@@ -135,10 +141,10 @@ export default function Sidebar() {
       </nav>
 
       {/* Footer Info */}
-      <div style={{ paddingTop: '20px', borderTop: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ paddingTop: '16px', borderTop: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--success)' }}></div>
-          <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Meta API Connected</span>
+          <span style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>Meta API Active</span>
         </div>
         <button onClick={logout} style={{ background: 'none', border: 'none', color: 'var(--text-dim)', cursor: 'pointer' }} title="Logout">
           <LogOut size={16} />
