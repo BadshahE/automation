@@ -1,0 +1,25 @@
+{
+  "name": "ai-social-automation-platform",
+  "version": "2.0.0",
+  "description": "AI Facebook & Instagram Content Automation Platform",
+  "main": "server/src/server.js",
+  "scripts": {
+    "start": "node server/src/server.js",
+    "server": "node server/src/server.js",
+    "client": "npm --prefix client run dev",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "build": "npm --prefix client run build"
+  },
+  "keywords": [
+    "facebook",
+    "instagram",
+    "ai",
+    "automation",
+    "social-media"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^10.0.5"
+  }
+}

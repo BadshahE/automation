@@ -1,0 +1,1609 @@
+Absolutely. Below is an **enhanced, implementation-ready PRD** that keeps your original backend/business requirements but significantly expands the **React frontend architecture, pages, components, UX, state management, API integration, responsive design, error handling, and admin/creator workflows**.
+
+# Product Requirements Document
+
+## AI Facebook & Instagram Content Automation Platform
+
+**Document Version:** 2.0
+**Frontend:** React.js + Vite
+**Backend:** Node.js + Express.js
+**Database:** Supabase PostgreSQL
+**Queue & Scheduling:** BullMQ + Redis + Node Cron
+**Storage:** Supabase Storage / Cloudinary
+**Social APIs:** Meta Graph API + Instagram Graph API
+**AI:** Multiple Text & Image AI Providers with automatic fallback
+**Primary Users:** Admin, Creator
+
+---
+
+# 1. Product Overview
+
+The platform is an AI-powered social-media automation system that allows creators to connect their **Facebook Page and Instagram Business/Creator account once**, configure their content preferences, and allow the platform to automatically:
+
+* Generate social-media captions using AI.
+* Generate social-media images using AI.
+* Generate hashtags.
+* Schedule posts automatically.
+* Publish content to Facebook and Instagram.
+* Monitor publishing status.
+* Automatically respond to qualifying Instagram comments through DM.
+* Send predefined links through Comment-to-DM automation.
+* Maintain complete activity and automation logs.
+* Automatically switch between multiple AI providers when one provider fails or reaches its quota.
+
+The platform should require **minimal manual intervention after initial configuration**.
+
+---
+
+# 2. Product Goals
+
+### Primary Goals
+
+1. Automate social-media content creation.
+2. Automate Facebook and Instagram publishing.
+3. Reduce the manual work required from creators.
+4. Provide reliable AI generation through multiple providers.
+5. Provide automatic Comment-to-DM workflows.
+6. Provide a centralized dashboard for creators.
+7. Provide an administrative control center.
+8. Maintain secure Meta authentication and token management.
+9. Provide scalable background processing through queues.
+10. Make the application usable on desktop, tablet, and mobile.
+
+---
+
+# 3. User Roles
+
+## 3.1 Admin
+
+Admin can:
+
+* View all creators.
+* View connected Facebook accounts.
+* View connected Instagram accounts.
+* View all generated posts.
+* View scheduled posts.
+* View publishing failures.
+* View Comment-to-DM activity.
+* Manage AI provider keys.
+* Enable/disable AI providers.
+* Monitor API quotas.
+* Enable/disable creator accounts.
+* View system activity logs.
+* View system health.
+* View queue status.
+
+Admin **cannot modify creator content preferences without explicit administrative functionality being added later**.
+
+---
+
+## 3.2 Creator
+
+Creator can:
+
+* Register/login.
+* Manage profile.
+* Connect Facebook.
+* Connect Instagram.
+* Disconnect social accounts.
+* Configure niche.
+* Configure topics.
+* Configure posting frequency.
+* Configure tone.
+* Configure writing style.
+* View generated posts.
+* View published posts.
+* View failed posts.
+* View upcoming posts.
+* Configure Comment-to-DM rules.
+* Enable/disable automations.
+* View basic analytics.
+* View activity history.
+
+A creator must only have access to their own data.
+
+---
+
+# 4. Frontend Architecture
+
+The React application should use a modular architecture rather than placing all functionality inside `App.jsx`.
+
+### Recommended structure
+
+```text
+src/
+│
+├── assets/
+│
+├── components/
+│   ├── common/
+│   │   ├── Button.jsx
+│   │   ├── Input.jsx
+│   │   ├── Modal.jsx
+│   │   ├── Dropdown.jsx
+│   │   ├── Toggle.jsx
+│   │   ├── Loader.jsx
+│   │   ├── EmptyState.jsx
+│   │   ├── ErrorState.jsx
+│   │   └── ConfirmDialog.jsx
+│   │
+│   ├── layout/
+│   │   ├── Sidebar.jsx
+│   │   ├── Topbar.jsx
+│   │   ├── MobileNavbar.jsx
+│   │   └── DashboardLayout.jsx
+│   │
+│   ├── dashboard/
+│   │   ├── StatCard.jsx
+│   │   ├── RecentPosts.jsx
+│   │   ├── UpcomingPosts.jsx
+│   │   └── ActivityFeed.jsx
+│   │
+│   ├── posts/
+│   │   ├── PostCard.jsx
+│   │   ├── PostPreview.jsx
+│   │   ├── PostStatus.jsx
+│   │   ├── PlatformBadge.jsx
+│   │   └── PostFilters.jsx
+│   │
+│   ├── automation/
+│   │   ├── AutomationCard.jsx
+│   │   ├── AutomationForm.jsx
+│   │   ├── KeywordInput.jsx
+│   │   └── AutomationStatus.jsx
+│   │
+│   ├── accounts/
+│   │   ├── FacebookConnection.jsx
+│   │   ├── InstagramConnection.jsx
+│   │   └── ConnectionStatus.jsx
+│   │
+│   └── admin/
+│       ├── UserTable.jsx
+│       ├── ProviderTable.jsx
+│       ├── PostLogs.jsx
+│       └── AutomationLogs.jsx
+│
+├── pages/
+│   ├── auth/
+│   │   ├── Login.jsx
+│   │   ├── Register.jsx
+│   │   └── ForgotPassword.jsx
+│   │
+│   ├── creator/
+│   │   ├── Dashboard.jsx
+│   │   ├── Profile.jsx
+│   │   ├── ConnectAccounts.jsx
+│   │   ├── ContentPreferences.jsx
+│   │   ├── MyPosts.jsx
+│   │   ├── ScheduledPosts.jsx
+│   │   ├── Automations.jsx
+│   │   └── Analytics.jsx
+│   │
+│   └── admin/
+│       ├── AdminDashboard.jsx
+│       ├── Users.jsx
+│       ├── Accounts.jsx
+│       ├── Posts.jsx
+│       ├── Automations.jsx
+│       ├── Providers.jsx
+│       └── ActivityLogs.jsx
+│
+├── services/
+│   ├── api.js
+│   ├── authApi.js
+│   ├── postApi.js
+│   ├── socialApi.js
+│   ├── automationApi.js
+│   └── adminApi.js
+│
+├── hooks/
+│   ├── useAuth.js
+│   ├── usePosts.js
+│   ├── useAutomations.js
+│   └── useAccounts.js
+│
+├── context/
+│   └── AuthContext.jsx
+│
+├── routes/
+│   ├── AppRoutes.jsx
+│   ├── ProtectedRoute.jsx
+│   └── AdminRoute.jsx
+│
+├── utils/
+│   ├── validation.js
+│   ├── formatDate.js
+│   └── constants.js
+│
+├── App.jsx
+├── main.jsx
+└── index.css
+```
+
+---
+
+# 5. Frontend Technology Requirements
+
+The React frontend should use:
+
+* React.js
+* Vite
+* React Router
+* Axios or Fetch API
+* Context API or Zustand for global state
+* React Hook Form for forms
+* Zod/Yup for validation
+* Tailwind CSS or another consistent UI system
+* Recharts for analytics
+* Lucide React or equivalent icon library
+* Toast notifications
+* Responsive CSS
+* Error boundaries
+* Loading states
+* Skeleton loaders
+
+The frontend must **never expose Meta access tokens or AI provider API keys**.
+
+---
+
+# 6. Application Routing
+
+## Public Routes
+
+```text
+/login
+/register
+/forgot-password
+```
+
+## Creator Routes
+
+```text
+/dashboard
+/profile
+/connect-accounts
+/content-preferences
+/posts
+/posts/scheduled
+/automations
+/analytics
+/settings
+```
+
+## Admin Routes
+
+```text
+/admin
+/admin/users
+/admin/accounts
+/admin/posts
+/admin/automations
+/admin/providers
+/admin/activity-logs
+```
+
+---
+
+# 7. Authentication Frontend
+
+## Login Page
+
+The login page should contain:
+
+* Application logo.
+* Email field.
+* Password field.
+* Show/hide password.
+* Remember-me option.
+* Login button.
+* Forgot-password link.
+* Register link.
+* Loading state.
+* Validation errors.
+* API errors.
+
+### Login flow
+
+```text
+User enters credentials
+        ↓
+React validation
+        ↓
+POST /api/auth/login
+        ↓
+Backend authentication
+        ↓
+JWT/session returned
+        ↓
+AuthContext updated
+        ↓
+Role checked
+        ↓
+Creator → /dashboard
+Admin → /admin
+```
+
+---
+
+# 8. Creator Dashboard
+
+The creator dashboard is the application's primary screen.
+
+### Dashboard layout
+
+```text
+┌─────────────────────────────────────────────┐
+│ Topbar                         Profile       │
+├──────────────┬──────────────────────────────┤
+│ Sidebar      │ Welcome, Creator             │
+│              │                              │
+│ Dashboard    │ ┌──────┐ ┌──────┐ ┌──────┐ │
+│ Posts        │ │Posts │ │ DMs  │ │Next  │ │
+│ Scheduled    │ └──────┘ └──────┘ └──────┘ │
+│ Automations  │                              │
+│ Analytics    │ Upcoming Posts               │
+│ Accounts     │                              │
+│ Preferences  │ Recent Activity              │
+└──────────────┴──────────────────────────────┘
+```
+
+### Dashboard cards
+
+Display:
+
+* Total posts.
+* Successful posts.
+* Failed posts.
+* Automated DMs.
+* Connected accounts.
+* Next scheduled post.
+
+---
+
+# 9. Connect Accounts Page
+
+The frontend should provide dedicated connection cards.
+
+### Facebook Card
+
+```text
+Facebook
+Connected ✓
+
+Page: My Business Page
+Status: Active
+Last synced: 2 minutes ago
+
+[Disconnect]
+```
+
+### Instagram Card
+
+```text
+Instagram
+Connected ✓
+
+Account: @businessaccount
+Type: Business
+Status: Active
+
+[Disconnect]
+```
+
+If not connected:
+
+```text
+Facebook
+Connect your Facebook Page
+
+[Connect Facebook]
+```
+
+---
+
+# 10. Meta OAuth Frontend Flow
+
+When the creator clicks **Connect Facebook**:
+
+```text
+React Button
+     ↓
+GET /api/meta/auth
+     ↓
+Backend generates OAuth URL
+     ↓
+Meta OAuth
+     ↓
+User grants permissions
+     ↓
+Meta redirects to backend callback
+     ↓
+Backend exchanges code
+     ↓
+Token encrypted and stored
+     ↓
+Frontend receives connection status
+     ↓
+Dashboard updated
+```
+
+The frontend should never handle or persist the raw long-lived Meta token.
+
+---
+
+# 11. Content Preferences UI
+
+The creator should have a visual preference form.
+
+### Fields
+
+**Niche**
+
+```text
+[ Fitness ▼ ]
+```
+
+**Posting Frequency**
+
+```text
+○ Once Daily
+○ Twice Daily
+○ Three Times Weekly
+○ Weekly
+```
+
+**Tone**
+
+```text
+☑ Professional
+☐ Friendly
+☐ Funny
+☐ Inspirational
+☐ Educational
+```
+
+**Content Topics**
+
+```text
+[ AI ] [ Technology ] [ Business ] [+ Add]
+```
+
+**Language**
+
+```text
+[ English ▼ ]
+```
+
+**Hashtag preference**
+
+```text
+○ Automatic
+○ Manual
+```
+
+Button:
+
+```text
+[Save Preferences]
+```
+
+---
+
+# 12. AI Content Generation Interface
+
+The frontend should provide a generation status interface.
+
+```text
+Creating your post...
+
+✓ Understanding content preferences
+✓ Generating caption
+✓ Generating hashtags
+● Generating image
+○ Uploading image
+○ Scheduling post
+```
+
+The user should not need to remain on the page while generation occurs.
+
+---
+
+# 13. Post Preview
+
+Every generated post should have a preview.
+
+### Preview card
+
+```text
+┌──────────────────────────────┐
+│ Instagram                    │
+│                              │
+│       [Generated Image]      │
+│                              │
+│ Caption                      │
+│ ---------------------------  │
+│ AI-generated caption...      │
+│                              │
+│ #technology #AI #business    │
+│                              │
+│ Status: Scheduled            │
+│ Date: 20 Sep 2026, 7:00 PM  │
+└──────────────────────────────┘
+```
+
+Actions:
+
+* View.
+* Retry.
+* Delete/cancel if allowed.
+* View automation.
+* View publishing details.
+
+---
+
+# 14. My Posts Page
+
+The creator should be able to switch between:
+
+```text
+[All] [Published] [Scheduled] [Failed]
+```
+
+Additional filters:
+
+* Facebook
+* Instagram
+* Date
+* Status
+
+### Post card information
+
+* Image.
+* Caption.
+* Platform.
+* Created date.
+* Scheduled date.
+* Published date.
+* Status.
+* Meta post ID.
+* Failure reason.
+
+---
+
+# 15. Scheduled Posts Calendar
+
+Add a calendar interface to make scheduling easier to understand.
+
+Example:
+
+```text
+       September 2026
+
+Mon Tue Wed Thu Fri Sat Sun
+             1   2   3   4
+ 5   6   7   8   9  10  11
+12  13  14  15  16  17  18
+19  20  21  22  23  24  25
+26  27  28  29  30
+```
+
+Scheduled posts should appear as calendar events.
+
+Clicking an event opens:
+
+* Image.
+* Caption.
+* Platform.
+* Status.
+* Scheduled time.
+
+---
+
+# 16. Comment-to-DM Automation UI
+
+The automation page should clearly communicate how the feature works.
+
+### Create automation
+
+```text
+Select Post
+[Choose Post ▼]
+
+Trigger Keywords
+[price] [link] [buy]
+
+DM Message
+[Thanks for your interest! Check the link below.]
+
+DM Link
+[https://example.com]
+
+Automation
+[ ON ]
+
+[Create Automation]
+```
+
+---
+
+# 17. Automation Rules
+
+Each automation should display:
+
+```text
+Summer Offer
+
+Keywords:
+price, offer, buy
+
+Triggered Comments: 124
+DMs Sent: 119
+
+Status: ON
+
+[Edit] [Disable] [Delete]
+```
+
+The frontend should show an informational note:
+
+> Each qualifying comment can trigger only one automated private reply under the applicable Meta API behavior.
+
+---
+
+# 18. Automation Activity
+
+Provide an activity table:
+
+| Comment       | Keyword | DM Status     | Date  |
+| ------------- | ------- | ------------- | ----- |
+| "Price?"      | price   | Sent          | Today |
+| "How to buy?" | buy     | Sent          | Today |
+| "Interested"  | —       | Not triggered | Today |
+
+This allows creators to understand whether their automation is working.
+
+---
+
+# 19. Creator Analytics
+
+Version 1 analytics:
+
+```text
+Total Posts
+125
+
+Successful Posts
+119
+
+Failed Posts
+6
+
+Automated DMs
+842
+
+Next Post
+Today, 7:00 PM
+```
+
+Charts:
+
+* Posts per week.
+* Posts by platform.
+* DMs per day.
+* Automation activity.
+
+Advanced engagement metrics can be added in Version 2.
+
+---
+
+# 20. Admin Dashboard
+
+The Admin dashboard should use a more information-dense layout.
+
+### Overview
+
+Display:
+
+```text
+Total Creators
+1,284
+
+Active Creators
+1,172
+
+Posts Today
+4,829
+
+Posts This Month
+96,420
+
+Automated DMs
+283,902
+
+Failed Jobs
+213
+```
+
+---
+
+# 21. Admin User Management
+
+Table:
+
+| Creator   | Email | Facebook  | Instagram | Status | Posts | Action  |
+| --------- | ----- | --------- | --------- | ------ | ----- | ------- |
+| Creator 1 | ...   | Connected | Connected | Active | 42    | Disable |
+| Creator 2 | ...   | Connected | —         | Active | 21    | Disable |
+
+Admin can:
+
+* Search.
+* Filter.
+* Activate.
+* Deactivate.
+* View creator.
+* View activity.
+
+---
+
+# 22. Admin AI Provider Management
+
+Provider cards/table:
+
+```text
+Provider       Type       Status       Usage      Priority
+OpenAI         Text       Active       42%        1
+Provider B     Text       Active       71%        2
+Provider C     Image      Active       36%        1
+Provider D     Image      Error        100%       2
+```
+
+Admin controls:
+
+* Enable.
+* Disable.
+* Change priority.
+* View usage.
+* View errors.
+* Rotate API key.
+
+API keys must never be returned to the React frontend in plaintext.
+
+---
+
+# 23. System Activity Logs
+
+Admin should see:
+
+```text
+18:05  Post published successfully
+17:58  AI provider switched
+17:42  Instagram token refreshed
+17:35  Comment automation triggered
+17:20  Creator account disabled
+```
+
+Filters:
+
+* User.
+* Event.
+* Platform.
+* Success/failure.
+* Date range.
+
+---
+
+# 24. Backend API Contract
+
+The frontend should communicate with the Express backend through versioned APIs.
+
+```text
+/api/v1/auth
+/api/v1/users
+/api/v1/meta
+/api/v1/posts
+/api/v1/automations
+/api/v1/preferences
+/api/v1/analytics
+/api/v1/admin
+```
+
+Example:
+
+```text
+POST /api/v1/auth/login
+POST /api/v1/auth/register
+
+GET /api/v1/meta/connect
+GET /api/v1/meta/callback
+
+GET /api/v1/posts
+GET /api/v1/posts/scheduled
+POST /api/v1/posts/generate
+
+GET /api/v1/automations
+POST /api/v1/automations
+PATCH /api/v1/automations/:id
+DELETE /api/v1/automations/:id
+```
+
+---
+
+# 25. API State Handling
+
+Every frontend API request should support:
+
+```text
+idle
+loading
+success
+error
+```
+
+Example:
+
+```text
+Loading...
+     ↓
+Success → update UI
+     ↓
+Error → show retry option
+```
+
+Avoid showing blank screens when API requests fail.
+
+---
+
+# 26. Global Error Handling
+
+React should include an Error Boundary.
+
+For unexpected errors:
+
+```text
+Something went wrong.
+
+We couldn't load this page.
+
+[Try Again]
+[Go to Dashboard]
+```
+
+API errors should use toast notifications for smaller actions.
+
+---
+
+# 27. Responsive Design
+
+The application must support:
+
+### Desktop
+
+* Sidebar.
+* Topbar.
+* Multi-column dashboard.
+* Data tables.
+
+### Tablet
+
+* Collapsible sidebar.
+* Two-column cards.
+
+### Mobile
+
+* Bottom navigation or hamburger menu.
+* Single-column cards.
+* Responsive tables converted to cards.
+* Mobile-friendly forms.
+* Touch-friendly controls.
+
+---
+
+# 28. Frontend Security Requirements
+
+The React application must:
+
+* Never store Meta access tokens in localStorage.
+* Never store AI API keys.
+* Never expose provider credentials.
+* Validate user input.
+* Sanitize displayed content where necessary.
+* Handle expired sessions.
+* Redirect unauthorized users.
+* Enforce role-based routing.
+* Avoid exposing admin APIs to creator users.
+
+Backend authorization remains the final security boundary.
+
+---
+
+# 29. Database Schema
+
+### users
+
+```text
+id
+email
+role
+name
+created_at
+active
+```
+
+### social_connections
+
+```text
+id
+user_id
+platform
+page_id
+instagram_user_id
+encrypted_access_token
+token_expiry
+connected_at
+```
+
+### content_preferences
+
+```text
+id
+user_id
+niche
+tone
+posting_frequency
+topics
+language
+style
+```
+
+### posts
+
+```text
+id
+user_id
+platform
+image_url
+caption
+status
+meta_post_id
+created_at
+published_at
+scheduled_at
+failure_reason
+```
+
+### comment_automations
+
+```text
+id
+user_id
+post_id
+keywords
+dm_message
+dm_link
+active
+created_at
+```
+
+### automation_logs
+
+```text
+id
+automation_id
+commenter_id
+comment_text
+comment_id
+dm_sent
+timestamp
+```
+
+### api_providers
+
+```text
+id
+provider_name
+type
+encrypted_api_key
+status
+daily_usage
+quota_limit
+priority
+```
+
+### api_usage_logs
+
+```text
+id
+provider_id
+post_id
+timestamp
+success
+error_message
+```
+
+---
+
+# 30. Queue Architecture
+
+The system should use BullMQ + Redis.
+
+Recommended queues:
+
+```text
+content-generation
+image-generation
+image-upload
+post-publishing
+comment-automation
+dm-sending
+token-refresh
+retry
+```
+
+Example:
+
+```text
+Cron
+ ↓
+Generate Content Job
+ ↓
+Caption Queue
+ ↓
+Image Queue
+ ↓
+Storage Queue
+ ↓
+Publishing Queue
+ ↓
+Meta API
+ ↓
+Database Log
+```
+
+---
+
+# 31. AI Provider Failover
+
+Example:
+
+```text
+Provider 1
+    ↓ failure
+Provider 2
+    ↓ failure
+Provider 3
+    ↓ failure
+Provider 4
+    ↓ success
+Generation completed
+```
+
+Maximum:
+
+**3 attempts per generation task**, using different available providers.
+
+The system should avoid repeatedly retrying a provider that is currently marked exhausted/error.
+
+---
+
+# 32. Publishing Workflow
+
+```text
+Scheduled Job
+      ↓
+Load Post
+      ↓
+Validate Social Connection
+      ↓
+Check Token
+      ↓
+Upload/Verify Image
+      ↓
+Instagram Media Container
+      ↓
+Poll Container
+      ↓
+Publish Media
+      ↓
+Save Meta Post ID
+      ↓
+Mark Success
+```
+
+For Facebook:
+
+```text
+Post Image + Caption
+       ↓
+Facebook Graph API
+       ↓
+Save Post ID
+       ↓
+Mark Success
+```
+
+Failures should be recorded with a human-readable error message.
+
+---
+
+# 33. Comment-to-DM Workflow
+
+```text
+Instagram Comment
+       ↓
+Meta Webhook
+       ↓
+Verify Webhook
+       ↓
+Check comment_id
+       ↓
+Already processed?
+   ↓ Yes        ↓ No
+Ignore          Continue
+                  ↓
+          Find active automation
+                  ↓
+          Match keywords
+                  ↓
+             Keyword match?
+             ↓          ↓
+            No          Yes
+            End          ↓
+                  Send Private Reply
+                         ↓
+                   Log result
+```
+
+---
+
+# 34. Webhook Security
+
+Webhook endpoints must:
+
+* Validate Meta verification requests.
+* Validate webhook signatures where applicable.
+* Validate event payloads.
+* Use idempotency.
+* Reject malformed requests.
+* Log failures.
+* Respond quickly to Meta.
+* Process expensive work asynchronously through queues.
+
+---
+
+# 35. Meta Account Requirements
+
+The platform should clearly communicate to users that Instagram automation requires an eligible **professional Instagram account connected to a Facebook Page**, and that available Meta permissions/features depend on Meta's current platform policies and app-review requirements.
+
+The exact permissions and API capabilities should be verified against the current Meta documentation during implementation rather than hard-coded into the product assumptions.
+
+---
+
+# 36. Notification System
+
+The frontend should support notifications for:
+
+* Successful account connection.
+* Failed connection.
+* Post successfully published.
+* Post failed.
+* AI generation failed.
+* Token expiration warning.
+* Automation successfully triggered.
+* Provider failure.
+* Account disconnected.
+
+Notification UI:
+
+```text
+🔔 Notifications
+
+Post published successfully.
+2 minutes ago
+
+Instagram token needs attention.
+1 hour ago
+```
+
+---
+
+# 37. Loading & Empty States
+
+Every major page needs a proper empty state.
+
+Example:
+
+```text
+No posts yet
+
+Your AI-generated posts will appear here.
+
+[Configure Content Preferences]
+```
+
+Instead of displaying a blank page.
+
+---
+
+# 38. Design System
+
+The frontend should use a consistent design system.
+
+### Components
+
+* Primary button.
+* Secondary button.
+* Danger button.
+* Inputs.
+* Selects.
+* Toggles.
+* Cards.
+* Tables.
+* Badges.
+* Modals.
+* Drawers.
+* Tooltips.
+* Toasts.
+* Skeleton loaders.
+
+### Status colors
+
+Use semantic states:
+
+* Success.
+* Warning.
+* Error.
+* Information.
+* Neutral.
+
+The design should feel like a modern SaaS dashboard rather than a basic CRUD application.
+
+---
+
+# 39. UX Requirements
+
+The frontend should prioritize:
+
+1. Simple onboarding.
+2. Clear account connection status.
+3. Minimal configuration.
+4. Visible automation status.
+5. Easy troubleshooting.
+6. Clear publishing status.
+7. Mobile responsiveness.
+8. Fast navigation.
+9. No unnecessary page reloads.
+10. Clear error messages.
+
+---
+
+# 40. Creator Onboarding
+
+First-time users should receive a guided setup:
+
+```text
+Welcome
+  ↓
+Create Profile
+  ↓
+Choose Niche
+  ↓
+Set Content Preferences
+  ↓
+Connect Facebook
+  ↓
+Connect Instagram
+  ↓
+Choose Posting Frequency
+  ↓
+Enable AI Automation
+  ↓
+Dashboard
+```
+
+A progress indicator should show:
+
+```text
+Step 3 of 6
+██████████░░░░
+```
+
+---
+
+# 41. Admin System Health
+
+Add a system-health page containing:
+
+```text
+API Status          ● Operational
+Database            ● Operational
+Redis               ● Operational
+Meta API            ● Operational
+AI Providers        ● Operational
+Queue Workers       ● 8 Active
+Failed Jobs         12
+```
+
+This makes production monitoring much easier.
+
+---
+
+# 42. Non-Functional Requirements
+
+## Performance
+
+* Dashboard initial load should target under 2–3 seconds under normal conditions.
+* Use pagination for large tables.
+* Lazy-load heavy pages/components.
+* Optimize images.
+* Avoid unnecessary API calls.
+
+## Scalability
+
+System should support:
+
+* Thousands of creators.
+* Large post queues.
+* Multiple background workers.
+* Rate-limited Meta publishing.
+* Independent AI provider pools.
+
+## Reliability
+
+* Retry failed jobs.
+* Dead-letter failed jobs.
+* Maintain audit logs.
+* Use idempotency.
+* Monitor queues.
+
+## Security
+
+* Encrypted credentials.
+* HTTPS.
+* Secure cookies/session handling.
+* RBAC.
+* Server-side authorization.
+* Input validation.
+* Webhook verification.
+
+---
+
+# 43. Recommended Frontend State Architecture
+
+Separate state into:
+
+### Authentication State
+
+```text
+user
+role
+session
+isAuthenticated
+```
+
+### Account State
+
+```text
+facebookConnection
+instagramConnection
+connectionStatus
+```
+
+### Content State
+
+```text
+posts
+scheduledPosts
+selectedPost
+generationStatus
+```
+
+### Automation State
+
+```text
+automations
+automationLogs
+selectedAutomation
+```
+
+### UI State
+
+```text
+sidebarOpen
+modalOpen
+notifications
+loading
+```
+
+For a larger production application, Zustand can be used instead of putting everything into React Context.
+
+---
+
+# 44. Frontend-to-Backend Data Flow
+
+```text
+                 React Frontend
+                       │
+                 REST API Layer
+                       │
+                 Express Backend
+                       │
+        ┌──────────────┼──────────────┐
+        ↓              ↓              ↓
+    Supabase         Redis          Meta API
+        │              │              │
+        │          BullMQ             │
+        │              │              │
+        └──────────────┼──────────────┘
+                       ↓
+                 AI Provider Pool
+```
+
+---
+
+# 45. Version 1 MVP
+
+The first production version should include:
+
+### Authentication
+
+* Register.
+* Login.
+* Logout.
+* Role-based access.
+
+### Social Accounts
+
+* Facebook connection.
+* Instagram connection.
+* Connection status.
+* Disconnect.
+
+### AI
+
+* Caption generation.
+* Hashtag generation.
+* Image generation.
+* Provider fallback.
+
+### Publishing
+
+* Instagram Feed publishing.
+* Facebook Page publishing.
+* Scheduling.
+* Publishing logs.
+
+### Automation
+
+* Keyword triggers.
+* Comment-to-DM.
+* Idempotency.
+* Automation logs.
+
+### Creator Dashboard
+
+* Dashboard.
+* Posts.
+* Scheduled posts.
+* Preferences.
+* Automations.
+* Account connections.
+
+### Admin Dashboard
+
+* Users.
+* Accounts.
+* Posts.
+* Automations.
+* AI provider pool.
+* Activity logs.
+
+---
+
+# 46. Version 2
+
+Future features:
+
+* Advanced engagement analytics.
+* Likes.
+* Comments.
+* Reach.
+* Impressions.
+* Multiple daily posting slots.
+* Manual approval workflow.
+* Stories.
+* Reels.
+* Product cards.
+* Story-reply automation.
+* New-follower automation.
+* Advanced content calendar.
+* AI-generated content variations.
+* A/B testing.
+* Best-time-to-post recommendations based on account-specific historical data.
+
+---
+
+# 47. Acceptance Criteria
+
+The product is considered MVP-ready when:
+
+* A creator can register and log in.
+* Admin and creator roles are enforced.
+* A creator can connect an eligible Facebook Page/Instagram professional account through Meta's supported OAuth flow.
+* Connection credentials are securely handled server-side.
+* Creator preferences can be saved.
+* AI content can be generated.
+* AI provider failure triggers fallback behavior.
+* Generated images can be stored and supplied to Meta as required.
+* Posts can be scheduled.
+* Posts can be published.
+* Publishing results are logged.
+* Comment webhooks can be received and verified.
+* Keyword automation works for new qualifying comments.
+* Duplicate webhook events do not create duplicate DMs.
+* Creator can enable/disable automation.
+* Admin can monitor users, posts, automations, providers, and logs.
+* Application works responsively on desktop, tablet, and mobile.
+* API failures display useful frontend error states.
+* No secret API credentials are exposed to the browser.
+
+---
+
+# 48. Final Product Architecture
+
+```text
+                         ┌──────────────────────┐
+                         │      CREATOR         │
+                         │ React Web Dashboard  │
+                         └──────────┬───────────┘
+                                    │
+                                    ▼
+                         ┌──────────────────────┐
+                         │    EXPRESS API       │
+                         │ Authentication/RBAC  │
+                         └──────────┬───────────┘
+                                    │
+              ┌─────────────────────┼─────────────────────┐
+              │                     │                     │
+              ▼                     ▼                     ▼
+       ┌──────────────┐      ┌──────────────┐      ┌──────────────┐
+       │   Supabase   │      │    Redis     │      │   Meta APIs  │
+       │  PostgreSQL  │      │   BullMQ     │      │ FB + IG APIs │
+       └──────────────┘      └──────┬───────┘      └──────────────┘
+                                    │
+                                    ▼
+                           ┌─────────────────┐
+                           │ Background      │
+                           │ Workers         │
+                           └────────┬────────┘
+                                    │
+                     ┌──────────────┼──────────────┐
+                     ▼              ▼              ▼
+                Text AI         Image AI       Publishing
+                Provider 1      Provider 1       Engine
+                Provider 2      Provider 2
+                Provider 3      Provider 3
+                Provider 4      Provider 4
+                     │              │
+                     └──────┬───────┘
+                            ▼
+                     ┌──────────────┐
+                     │ AI Provider  │
+                     │ Failover     │
+                     └──────────────┘
+
+                         ┌──────────────────────┐
+                         │       ADMIN          │
+                         │ React Admin Console  │
+                         └──────────────────────┘
+```
+
+## 49. Product Principle
+
+The central product experience should be:
+
+**Connect → Configure → Automate → Generate → Publish → Monitor**
+
+The creator should spend only a few minutes during initial setup and then be able to manage their entire Facebook/Instagram content workflow from one React dashboard.
+
+This version is structured so it can be handed directly to a developer/AI coding agent such as **Antigravity** as the product and frontend specification.
